@@ -288,7 +288,10 @@ def run(src, dest):
     errors = []
     alphaCount = 0
     gif_with_face = 0
-    logfile = 'silverDataScrubLog-%s.txt' % os.path.basename(dest)
+    logdir = 'logs'
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
+    logfile = os.path.join(logdir, 'silverDataScrubLog-%s.txt' % os.path.basename(dest))
 
     if os.path.isfile(logfile):
         with open(logfile) as f:
