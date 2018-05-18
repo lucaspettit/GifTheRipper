@@ -1,0 +1,834 @@
+----------------------
+file #      : 0-20
+gifs w/faces: 19
+fail        : 0
+num alpha   : 0
+time        : 05/14 08:14:17----------------------
+file #      : 20-40
+gifs w/faces: 39
+fail        : 0
+num alpha   : 2
+time        : 05/14 08:16:07----------------------
+file #      : 40-60
+gifs w/faces: 56
+fail        : 3
+num alpha   : 4
+time        : 05/14 08:17:05
+Failed GIFs:
+	filename: 43
+	error   : too many indices for array
+	filename: 47
+	error   : too many indices for array
+	filename: 56
+	error   : too many indices for array
+----------------------
+file #      : 60-80
+gifs w/faces: 75
+fail        : 1
+num alpha   : 4
+time        : 05/14 08:17:55
+Failed GIFs:
+	filename: 74
+	error   : too many indices for array
+----------------------
+file #      : 80-100
+gifs w/faces: 92
+fail        : 3
+num alpha   : 7
+time        : 05/14 08:18:39
+Failed GIFs:
+	filename: 82
+	error   : too many indices for array
+	filename: 86
+	error   : too many indices for array
+	filename: 88
+	error   : too many indices for array
+----------------------
+file #      : 100-120
+gifs w/faces: 110
+fail        : 2
+num alpha   : 14
+time        : 05/14 08:20:30
+Failed GIFs:
+	filename: 109
+	error   : too many indices for array
+	filename: 113
+	error   : [08:19:51] c:\projects\mxnet-distro-win\mxnet-build\src\storage\./cpu_device_storage.h:70: Failed to allocate CPU Memory
+----------------------
+file #      : 120-140
+gifs w/faces: 127
+fail        : 3
+num alpha   : 22
+time        : 05/14 08:22:35
+Failed GIFs:
+	filename: 128
+	error   : too many indices for array
+	filename: 132
+	error   : tile cannot extend outside image
+	filename: 138
+	error   : too many indices for array
+----------------------
+file #      : 140-160
+gifs w/faces: 146
+fail        : 1
+num alpha   : 24
+time        : 05/14 08:27:07
+Failed GIFs:
+	filename: 140
+	error   : too many indices for array
+----------------------
+file #      : 160-180
+gifs w/faces: 164
+fail        : 2
+num alpha   : 33
+time        : 05/14 08:32:10
+Failed GIFs:
+	filename: 159
+	error   : too many indices for array
+	filename: 161
+	error   : too many indices for array
+----------------------
+file #      : 180-200
+gifs w/faces: 182
+fail        : 2
+num alpha   : 37
+time        : 05/14 08:38:24
+Failed GIFs:
+	filename: 183
+	error   : 
+	filename: 194
+	error   : too many indices for array
+----------------------
+file #      : 200-220
+gifs w/faces: 199
+fail        : 3
+num alpha   : 38
+time        : 05/14 08:39:28
+Failed GIFs:
+	filename: 202
+	error   : too many indices for array
+	filename: 217
+	error   : too many indices for array
+	filename: 218
+	error   : too many indices for array
+----------------------
+file #      : 220-240
+gifs w/faces: 216
+fail        : 3
+num alpha   : 39
+time        : 05/14 08:42:24
+Failed GIFs:
+	filename: 219
+	error   : too many indices for array
+	filename: 233
+	error   : too many indices for array
+	filename: 235
+	error   : too many indices for array
+----------------------
+file #      : 240-260
+gifs w/faces: 235
+fail        : 1
+num alpha   : 40
+time        : 05/14 08:43:19
+Failed GIFs:
+	filename: 242
+	error   : too many indices for array
+----------------------
+file #      : 260-280
+gifs w/faces: 253
+fail        : 2
+num alpha   : 41
+time        : 05/14 08:45:44
+Failed GIFs:
+	filename: 262
+	error   : too many indices for array
+	filename: 273
+	error   : too many indices for array
+----------------------
+file #      : 280-300
+gifs w/faces: 272
+fail        : 1
+num alpha   : 43
+time        : 05/14 08:46:25
+Failed GIFs:
+	filename: 294
+	error   : too many indices for array
+----------------------
+file #      : 300-320
+gifs w/faces: 290
+fail        : 2
+num alpha   : 46
+time        : 05/14 08:50:47
+Failed GIFs:
+	filename: 299
+	error   : too many indices for array
+	filename: 305
+	error   : too many indices for array
+----------------------
+file #      : 320-340
+gifs w/faces: 307
+fail        : 3
+num alpha   : 50
+time        : 05/14 08:52:38
+Failed GIFs:
+	filename: 331
+	error   : too many indices for array
+	filename: 335
+	error   : 
+	filename: 337
+	error   : too many indices for array
+----------------------
+file #      : 340-360
+gifs w/faces: 326
+fail        : 1
+num alpha   : 50
+time        : 05/14 08:54:11
+Failed GIFs:
+	filename: 341
+	error   : list index out of range
+----------------------
+file #      : 360-380
+gifs w/faces: 346
+fail        : 0
+num alpha   : 53
+time        : 05/14 08:55:34----------------------
+file #      : 380-400
+gifs w/faces: 366
+fail        : 0
+num alpha   : 58
+time        : 05/14 08:57:12----------------------
+file #      : 400-420
+gifs w/faces: 386
+fail        : 0
+num alpha   : 60
+time        : 05/14 08:58:54----------------------
+file #      : 420-440
+gifs w/faces: 404
+fail        : 2
+num alpha   : 65
+time        : 05/14 09:00:22
+Failed GIFs:
+	filename: 419
+	error   : too many indices for array
+	filename: 430
+	error   : too many indices for array
+----------------------
+file #      : 440-460
+gifs w/faces: 423
+fail        : 1
+num alpha   : 68
+time        : 05/14 09:02:15
+Failed GIFs:
+	filename: 449
+	error   : too many indices for array
+----------------------
+file #      : 460-480
+gifs w/faces: 442
+fail        : 1
+num alpha   : 69
+time        : 05/14 09:03:10
+Failed GIFs:
+	filename: 478
+	error   : too many indices for array
+----------------------
+file #      : 480-500
+gifs w/faces: 462
+fail        : 0
+num alpha   : 75
+time        : 05/14 09:05:48----------------------
+file #      : 500-520
+gifs w/faces: 482
+fail        : 0
+num alpha   : 79
+time        : 05/14 09:06:54----------------------
+file #      : 520-540
+gifs w/faces: 502
+fail        : 0
+num alpha   : 80
+time        : 05/14 09:07:47----------------------
+file #      : 540-560
+gifs w/faces: 520
+fail        : 2
+num alpha   : 85
+time        : 05/14 09:10:01
+Failed GIFs:
+	filename: 548
+	error   : too many indices for array
+	filename: 556
+	error   : too many indices for array
+----------------------
+file #      : 560-580
+gifs w/faces: 539
+fail        : 1
+num alpha   : 93
+time        : 05/14 09:10:40
+Failed GIFs:
+	filename: 570
+	error   : too many indices for array
+----------------------
+file #      : 580-600
+gifs w/faces: 559
+fail        : 0
+num alpha   : 106
+time        : 05/14 09:11:27----------------------
+file #      : 600-620
+gifs w/faces: 579
+fail        : 0
+num alpha   : 113
+time        : 05/14 09:13:34----------------------
+file #      : 620-640
+gifs w/faces: 597
+fail        : 2
+num alpha   : 114
+time        : 05/14 09:14:49
+Failed GIFs:
+	filename: 632
+	error   : tile cannot extend outside image
+	filename: 638
+	error   : too many indices for array
+----------------------
+file #      : 640-660
+gifs w/faces: 617
+fail        : 0
+num alpha   : 114
+time        : 05/14 09:15:27----------------------
+file #      : 660-680
+gifs w/faces: 634
+fail        : 3
+num alpha   : 114
+time        : 05/14 09:16:03
+Failed GIFs:
+	filename: 664
+	error   : too many indices for array
+	filename: 666
+	error   : too many indices for array
+	filename: 672
+	error   : too many indices for array
+----------------------
+file #      : 680-700
+gifs w/faces: 653
+fail        : 1
+num alpha   : 117
+time        : 05/14 09:17:10
+Failed GIFs:
+	filename: 680
+	error   : too many indices for array
+----------------------
+file #      : 700-720
+gifs w/faces: 672
+fail        : 1
+num alpha   : 121
+time        : 05/14 09:18:54
+Failed GIFs:
+	filename: 711
+	error   : too many indices for array
+----------------------
+file #      : 720-740
+gifs w/faces: 690
+fail        : 2
+num alpha   : 123
+time        : 05/14 09:21:04
+Failed GIFs:
+	filename: 723
+	error   : tile cannot extend outside image
+	filename: 727
+	error   : too many indices for array
+----------------------
+file #      : 740-760
+gifs w/faces: 710
+fail        : 0
+num alpha   : 126
+time        : 05/14 09:24:01----------------------
+file #      : 760-780
+gifs w/faces: 730
+fail        : 0
+num alpha   : 130
+time        : 05/14 09:27:33----------------------
+file #      : 780-800
+gifs w/faces: 750
+fail        : 0
+num alpha   : 134
+time        : 05/14 09:30:21----------------------
+file #      : 800-820
+gifs w/faces: 768
+fail        : 2
+num alpha   : 138
+time        : 05/14 09:32:34
+Failed GIFs:
+	filename: 802
+	error   : too many indices for array
+	filename: 813
+	error   : too many indices for array
+----------------------
+file #      : 820-840
+gifs w/faces: 787
+fail        : 1
+num alpha   : 141
+time        : 05/14 09:36:41
+Failed GIFs:
+	filename: 820
+	error   : too many indices for array
+----------------------
+file #      : 840-860
+gifs w/faces: 807
+fail        : 0
+num alpha   : 144
+time        : 05/14 09:38:49----------------------
+file #      : 860-880
+gifs w/faces: 826
+fail        : 1
+num alpha   : 144
+time        : 05/14 09:39:59
+Failed GIFs:
+	filename: 860
+	error   : too many indices for array
+----------------------
+file #      : 880-900
+gifs w/faces: 846
+fail        : 0
+num alpha   : 149
+time        : 05/14 09:41:13----------------------
+file #      : 900-920
+gifs w/faces: 866
+fail        : 0
+num alpha   : 152
+time        : 05/14 09:43:39----------------------
+file #      : 920-940
+gifs w/faces: 885
+fail        : 1
+num alpha   : 154
+time        : 05/14 09:45:53
+Failed GIFs:
+	filename: 921
+	error   : too many indices for array
+----------------------
+file #      : 940-960
+gifs w/faces: 905
+fail        : 0
+num alpha   : 158
+time        : 05/14 09:48:47----------------------
+file #      : 960-980
+gifs w/faces: 925
+fail        : 0
+num alpha   : 162
+time        : 05/14 09:50:11----------------------
+file #      : 980-1000
+gifs w/faces: 944
+fail        : 1
+num alpha   : 165
+time        : 05/14 09:52:43
+Failed GIFs:
+	filename: 996
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 1589952 bytes in function cv::OutOfMemoryError
+
+----------------------
+file #      : 1000-1020
+gifs w/faces: 963
+fail        : 1
+num alpha   : 169
+time        : 05/14 09:55:07
+Failed GIFs:
+	filename: 999
+	error   : too many indices for array
+----------------------
+file #      : 1020-1040
+gifs w/faces: 983
+fail        : 0
+num alpha   : 172
+time        : 05/14 09:57:20----------------------
+file #      : 1040-1060
+gifs w/faces: 1000
+fail        : 3
+num alpha   : 174
+time        : 05/14 09:58:48
+Failed GIFs:
+	filename: 1046
+	error   : 
+	filename: 1050
+	error   : [09:58:16] c:\projects\mxnet-distro-win\mxnet-build\src\storage\./cpu_device_storage.h:70: Failed to allocate CPU Memory
+	filename: 1055
+	error   : too many indices for array
+----------------------
+file #      : 1060-1080
+gifs w/faces: 1019
+fail        : 1
+num alpha   : 181
+time        : 05/14 10:00:08
+Failed GIFs:
+	filename: 1059
+	error   : too many indices for array
+----------------------
+file #      : 1080-1100
+gifs w/faces: 1039
+fail        : 0
+num alpha   : 184
+time        : 05/14 10:01:18----------------------
+file #      : 1100-1120
+gifs w/faces: 1059
+fail        : 0
+num alpha   : 187
+time        : 05/14 10:04:22----------------------
+file #      : 1120-1140
+gifs w/faces: 1077
+fail        : 2
+num alpha   : 188
+time        : 05/14 10:05:42
+Failed GIFs:
+	filename: 1126
+	error   : too many indices for array
+	filename: 1133
+	error   : too many indices for array
+----------------------
+file #      : 1140-1160
+gifs w/faces: 1097
+fail        : 0
+num alpha   : 188
+time        : 05/14 10:06:45----------------------
+file #      : 1160-1180
+gifs w/faces: 1117
+fail        : 0
+num alpha   : 188
+time        : 05/14 10:07:29----------------------
+file #      : 1180-1200
+gifs w/faces: 1137
+fail        : 0
+num alpha   : 190
+time        : 05/14 10:10:43----------------------
+file #      : 1200-1220
+gifs w/faces: 1157
+fail        : 0
+num alpha   : 192
+time        : 05/14 10:12:54----------------------
+file #      : 1220-1240
+gifs w/faces: 1177
+fail        : 0
+num alpha   : 196
+time        : 05/14 10:14:15----------------------
+file #      : 1240-1260
+gifs w/faces: 1197
+fail        : 0
+num alpha   : 197
+time        : 05/14 10:17:20----------------------
+file #      : 1260-1280
+gifs w/faces: 1217
+fail        : 0
+num alpha   : 197
+time        : 05/14 10:21:07----------------------
+file #      : 1280-1300
+gifs w/faces: 1235
+fail        : 2
+num alpha   : 200
+time        : 05/14 10:24:31
+Failed GIFs:
+	filename: 1288
+	error   : [10:23:05] c:\projects\mxnet-distro-win\mxnet-build\src\storage\./cpu_device_storage.h:70: Failed to allocate CPU Memory
+	filename: 1294
+	error   : too many indices for array
+----------------------
+file #      : 1300-1320
+gifs w/faces: 1255
+fail        : 0
+num alpha   : 203
+time        : 05/14 10:27:20----------------------
+file #      : 1320-1340
+gifs w/faces: 1274
+fail        : 1
+num alpha   : 203
+time        : 05/14 10:31:05
+Failed GIFs:
+	filename: 1319
+	error   : 
+----------------------
+file #      : 1340-1360
+gifs w/faces: 1292
+fail        : 2
+num alpha   : 205
+time        : 05/14 10:32:31
+Failed GIFs:
+	filename: 1339
+	error   : too many indices for array
+	filename: 1342
+	error   : too many indices for array
+----------------------
+file #      : 1360-1380
+gifs w/faces: 1311
+fail        : 1
+num alpha   : 211
+time        : 05/14 10:33:57
+Failed GIFs:
+	filename: 1378
+	error   : too many indices for array
+----------------------
+file #      : 1380-1400
+gifs w/faces: 1329
+fail        : 2
+num alpha   : 221
+time        : 05/14 10:35:45
+Failed GIFs:
+	filename: 1385
+	error   : too many indices for array
+	filename: 1398
+	error   : image file is truncated (112 bytes not processed)
+----------------------
+file #      : 1400-1420
+gifs w/faces: 1347
+fail        : 2
+num alpha   : 222
+time        : 05/14 10:36:34
+Failed GIFs:
+	filename: 1404
+	error   : too many indices for array
+	filename: 1417
+	error   : too many indices for array
+----------------------
+file #      : 1420-1440
+gifs w/faces: 1367
+fail        : 0
+num alpha   : 225
+time        : 05/14 10:37:34----------------------
+file #      : 1440-1460
+gifs w/faces: 1386
+fail        : 1
+num alpha   : 230
+time        : 05/14 10:40:05
+Failed GIFs:
+	filename: 1439
+	error   : too many indices for array
+----------------------
+file #      : 1460-1480
+gifs w/faces: 1404
+fail        : 2
+num alpha   : 233
+time        : 05/14 10:42:16
+Failed GIFs:
+	filename: 1459
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1461
+	error   : too many indices for array
+----------------------
+file #      : 1480-1500
+gifs w/faces: 1423
+fail        : 1
+num alpha   : 236
+time        : 05/14 10:44:20
+Failed GIFs:
+	filename: 1488
+	error   : tile cannot extend outside image
+----------------------
+file #      : 1500-1520
+gifs w/faces: 1443
+fail        : 0
+num alpha   : 242
+time        : 05/14 10:47:35----------------------
+file #      : 1520-1540
+gifs w/faces: 1462
+fail        : 1
+num alpha   : 250
+time        : 05/14 10:49:34
+Failed GIFs:
+	filename: 1519
+	error   : too many indices for array
+----------------------
+file #      : 1540-1560
+gifs w/faces: 1482
+fail        : 0
+num alpha   : 257
+time        : 05/14 10:51:14----------------------
+file #      : 1560-1580
+gifs w/faces: 1500
+fail        : 2
+num alpha   : 260
+time        : 05/14 10:54:12
+Failed GIFs:
+	filename: 1559
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1565
+	error   : too many indices for array
+----------------------
+file #      : 1580-1600
+gifs w/faces: 1519
+fail        : 1
+num alpha   : 262
+time        : 05/14 10:56:28
+Failed GIFs:
+	filename: 1589
+	error   : too many indices for array
+----------------------
+file #      : 1600-1620
+gifs w/faces: 1539
+fail        : 0
+num alpha   : 267
+time        : 05/14 10:57:38----------------------
+file #      : 1620-1640
+gifs w/faces: 1558
+fail        : 1
+num alpha   : 274
+time        : 05/14 10:58:27
+Failed GIFs:
+	filename: 1632
+	error   : too many indices for array
+----------------------
+file #      : 1640-1660
+gifs w/faces: 1577
+fail        : 1
+num alpha   : 281
+time        : 05/14 10:59:20
+Failed GIFs:
+	filename: 1645
+	error   : too many indices for array
+----------------------
+file #      : 1660-1680
+gifs w/faces: 1597
+fail        : 0
+num alpha   : 285
+time        : 05/14 11:00:12----------------------
+file #      : 1680-1700
+gifs w/faces: 1616
+fail        : 1
+num alpha   : 291
+time        : 05/14 11:01:50
+Failed GIFs:
+	filename: 1698
+	error   : too many indices for array
+----------------------
+file #      : 1700-1720
+gifs w/faces: 1633
+fail        : 3
+num alpha   : 293
+time        : 05/14 11:02:49
+Failed GIFs:
+	filename: 1701
+	error   : 
+	filename: 1703
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1713
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 870216 bytes in function cv::OutOfMemoryError
+
+----------------------
+file #      : 1720-1740
+gifs w/faces: 1647
+fail        : 6
+num alpha   : 293
+time        : 05/14 11:05:43
+Failed GIFs:
+	filename: 1728
+	error   : too many indices for array
+	filename: 1729
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1730
+	error   : 
+	filename: 1732
+	error   : too many indices for array
+	filename: 1735
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1736
+	error   : 
+----------------------
+file #      : 1740-1760
+gifs w/faces: 1665
+fail        : 2
+num alpha   : 294
+time        : 05/14 11:07:00
+Failed GIFs:
+	filename: 1747
+	error   : too many indices for array
+	filename: 1752
+	error   : too many indices for array
+----------------------
+file #      : 1760-1780
+gifs w/faces: 1681
+fail        : 4
+num alpha   : 295
+time        : 05/14 11:09:02
+Failed GIFs:
+	filename: 1775
+	error   : too many indices for array
+	filename: 1776
+	error   : too many indices for array
+	filename: 1777
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 872640 bytes in function cv::OutOfMemoryError
+
+	filename: 1778
+	error   : 
+----------------------
+file #      : 1780-1800
+gifs w/faces: 1696
+fail        : 5
+num alpha   : 296
+time        : 05/14 11:11:16
+Failed GIFs:
+	filename: 1779
+	error   : 
+	filename: 1782
+	error   : too many indices for array
+	filename: 1786
+	error   : C:\projects\opencv-python\opencv\modules\core\src\alloc.cpp:55: error: (-4) Failed to allocate 2764800 bytes in function cv::OutOfMemoryError
+
+	filename: 1795
+	error   : 
+	filename: 1798
+	error   : tile cannot extend outside image
+----------------------
+file #      : 1800-1820
+gifs w/faces: 1713
+fail        : 3
+num alpha   : 302
+time        : 05/14 11:13:12
+Failed GIFs:
+	filename: 1799
+	error   : tile cannot extend outside image
+	filename: 1800
+	error   : tile cannot extend outside image
+	filename: 1809
+	error   : too many indices for array
+----------------------
+file #      : 1820-1840
+gifs w/faces: 1733
+fail        : 0
+num alpha   : 308
+time        : 05/14 11:14:44----------------------
+file #      : 1840-1860
+gifs w/faces: 1752
+fail        : 1
+num alpha   : 312
+time        : 05/14 11:16:07
+Failed GIFs:
+	filename: 1855
+	error   : too many indices for array
+----------------------
+file #      : 1860-1880
+gifs w/faces: 1772
+fail        : 0
+num alpha   : 314
+time        : 05/14 11:17:50----------------------
+file #      : 1880-1900
+gifs w/faces: 1792
+fail        : 0
+num alpha   : 317
+time        : 05/14 11:20:04----------------------
+RESTARTING SCRUB [index=1900]
+----------------------
+file #      : 0-20
+gifs w/faces: 18
+fail        : 1
+num alpha   : 4
+time        : 05/14 19:38:06
+Failed GIFs:
+	filename: 1913
+	error   : too many indices for array
+----------------------
+file #      : 20-40
+gifs w/faces: 36
+fail        : 2
+num alpha   : 9
+time        : 05/14 19:38:55
+Failed GIFs:
+	filename: 1925
+	error   : too many indices for array
+	filename: 1928
+	error   : too many indices for array
