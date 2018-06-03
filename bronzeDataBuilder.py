@@ -5,7 +5,8 @@ from PIL import Image, ImagePalette
 import io
 import argparse
 import json
-import _pickle as pickle
+import time
+from tqdm import tqdm
 
 limit = 100
 giphy = giphypop.Giphy(api_key='NNfC3hdGO6xciq6jImRy17aLUjqzFIUf')
@@ -13,7 +14,9 @@ giphy = giphypop.Giphy(api_key='NNfC3hdGO6xciq6jImRy17aLUjqzFIUf')
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dest', type=str, help='Destination directory')
+    parser.add_argument('--src', type=str, required=True, help='Path to .JSON file with search terms')
+    parser.add_argument('--dest', type=str, required=True, help='Destination directory')
+    parser.add_argument('--limit', type=int, default=100, help='Limit the number of GIFs for each search')
     return parser.parse_args()
 
 
@@ -44,41 +47,121 @@ def gif2jpg(gifbytes):
 
 # load and validate arguments
 args = parse_args()
-if not path.isdir(args.dest):
-    makedirs(args.dest)
+logdir = 'logs'
+resdir = 'res'
+configdir = 'config'
+for p in (args.dest, logdir, resdir):
+    if not path.isdir(args.dest):
+        makedirs(args.dest)
+
 rootdir = args.dest
-evaluated = {}
+setname = path.basename(path.splitext(args.dest)[0])
+logfilename = path.join(logdir, '%s-Log.txt' % setname)
+configfilename = path.join(configdir, '%s-Config.json' % setname)
 
 # load search words (type = list)
-with open('words.json') as f:
-    words = json.load(f)
+with open(args.src) as f:
+    categories = json.load(f)
 
-start_index = 600
+if not isinstance(categories, dict):
+    raise ValueError('Cannot infer .json format')
 
-gifId = 14203
+# load config file
+if path.isfile(configfilename):
+    with open(configfilename) as f:
+        config = json.load(f)
 
-for index, term in enumerate(words[start_index:]):
-    print('index %d: "%s"' % (index+start_index, term))
-    num_new_gifs = 0
-    for gif in giphy.search(term, limit=limit):
-        try:
-            url = gif.media_url
+    # mesh them together
+    config_titles = list(config.keys())
+    for config_tile in config_titles:
+        for category_title in categories.keys():
+            if category_title not in config:
+                config[category_title] = 0
+            else:
+                idx = config_titles.index(category_title)
+                del config_titles[idx]
+    for title in config_titles:
+        del config[title]
 
-            if url not in evaluated:
-                r = requests.get(url)
-                data = r.content
-                open(path.join(rootdir, "%i.gif" % gifId), "wb").write(data)
-                evaluated[url] = gifId
-                gifId += 1
-                num_new_gifs += 1
+# create new config file
+else:
+    config = {
+        title: {
+            term: 0 for term in terms
+        } for title, terms in categories.items()
+    }
+    with open(configfilename, 'w') as f:
+        json.dump(config, f)
+categories = config
+
+if not path.isfile(logfilename):
+    open(logfilename, 'w').close()
 
 
-        except Exception as e:
-            print(e)
+for category, terms in categories.items():
 
-        print('  %d gifs added' % num_new_gifs)
+    # create new directory if needed
+    outdir = path.join(rootdir, category)
+    if not path.isdir(outdir):
+        makedirs(outdir)
 
-with open('evaluated.pkl', 'wb') as f:
-    pickle.dump(evaluated, f)
+    # write log file
+    logstr = 'category: %s\n' % category
+    with open(logfilename, 'a+') as f:
+        f.write(logstr)
+    print(logstr[:-1])
+
+    for term, start_index in terms.items():
+        logstr = '  term       : %s\n' % term
+        logstr += '  start index: %d\n' % start_index
+        with open(logfilename, 'a+') as f:
+            f.write(logstr)
+        print(logstr[:-1])
+
+        # query for each term
+        start_t = time.time()
+        success = 0
+        num_url_failed = 0
+        num_save_failed = 0
+        for i, gif in enumerate(giphy.search(term, limit=limit)):
+            if (i + 1) % 10 == 0:
+                end_t = time.time()
+                logstr = '    ------------------------\n'
+                logstr += '    current index  : %d\n' % (i + start_index)
+                logstr += '    gifs downloaded: %d\n' % success
+                logstr += '    url fails      : %d\n' % num_url_failed
+                logstr += '    save fails     : %d\n' % num_save_failed
+                logstr += '    time           : %.2f\n' % (end_t - start_t)
+                with open(logfilename, 'a+') as f:
+                    f.write(logstr)
+                print(logstr[:-1])
+
+                success = 0
+                num_url_failed = 0
+                num_save_failed = 0
+
+                # save config
+                config[category][term] = i + start_index
+                with open(configfilename, 'w') as f:
+                    json.dump(config, f, indent=2)
+                start_t = time.time()
+
+            try:
+                url = gif.media_url
+
+                try:
+                    r = requests.get(url)
+                    data = r.content
+                    filename = '%s_%d.gif' % (term, i)
+
+                    open(path.join(outdir, filename), "wb+").write(data)
+
+                    success += 1
+
+                except Exception as e:
+                    num_save_failed += 1
+            except Exception as e:
+                num_url_failed += 1
+
 
 print('done')
