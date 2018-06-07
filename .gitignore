@@ -106,3 +106,5 @@ site
 
 # mypy
 .mypy_cache
+.idea/GifTheRipper.iml
+.idea/workspace.xml
