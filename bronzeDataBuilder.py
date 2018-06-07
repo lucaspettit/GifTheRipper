@@ -72,7 +72,6 @@ for index, term in enumerate(words[start_index:]):
                 gifId += 1
                 num_new_gifs += 1
 
-
         except Exception as e:
             print(e)
 
