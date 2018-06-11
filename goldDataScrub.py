@@ -20,8 +20,9 @@ if not os.path.isdir(args.meta_src):
 if not os.path.isdir(args.dest):
     os.makedirs(args.dest)
 
-resdir = 'res'
-configdir = 'config'
+dirnames = init_dirs()
+resdir = dirnames['res']
+configdir = dirnames['config']
 dataset_name = os.path.basename(args.dest)
 
 configpath = os.path.join(configdir, 'goldDataScrubConfig-%s.json' % dataset_name)
