@@ -627,7 +627,6 @@ class GIF(object):
             finally:
                 writer.close()
 
-
 class Player(object):
 
     @staticmethod
@@ -688,6 +687,7 @@ if __name__ == '__main__':
 
     # build a FaceData object for every face in each frame
     face_data = unpackJson(args.json_src)
+
     target_dim = (256, 256)
     raw_snips = {}
     snips = {}
@@ -719,6 +719,7 @@ if __name__ == '__main__':
         ax3.set_ylabel('Value')
         fig.tight_layout()
         plt.savefig(os.path.join(args.dest, '%s-%d-smoothing-graph.png' % (gifname, i)), bbox_inches='tight')
+
 
         for fd, x, y, dim in zip(fds, nose_smooth_x, nose_smooth_y, dim_smooth):
             # get raw snip

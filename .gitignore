@@ -2,8 +2,13 @@
 __pycache__
 .py[cod]
 $py.class
+<<<<<<< HEAD
 .idea/
 config/
+=======
+config
+logs
+>>>>>>> 4dce682da7a6a848f41562545147f503ba412569
 
 # C extensions
 .so
@@ -107,5 +112,11 @@ site
 
 # mypy
 .mypy_cache
+<<<<<<< HEAD
 .idea/GifTheRipper.iml
 .idea/workspace.xml
+=======
+.idea/workspace.xml
+
+.idea/vcs.xml
+>>>>>>> 4dce682da7a6a848f41562545147f503ba412569

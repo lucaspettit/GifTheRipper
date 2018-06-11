@@ -270,8 +270,8 @@ def run(src, dest):
     if not os.path.isdir(src):
         raise (NotADirectoryError('"%s" is not a directory' % src))
 
-    if not os.path.isdir(dest):
-        os.makedirs(dest)
+    #if not os.path.isdir(dest):
+    #    os.makedirs(dest)
 
     # build detector
     print('loading MTCNN model')
@@ -301,6 +301,7 @@ def run(src, dest):
     logfile = os.path.join(logdir, 'silverDataScrubLog-%s.txt' % os.path.basename(dest))
     configfile = os.path.join(configdir, 'silverDataScrubConfig-%s.json' % os.path.basename(dest))
 
+
     print('loading config file')
     if os.path.isfile(configfile):
         with open(configfile) as f:
@@ -313,14 +314,19 @@ def run(src, dest):
 
     with open(logfile, 'a+') as f:
         f.write('Starting silver scrub\n')
+        f.write('%d files found\n' % len(files))
+    print('Starting silver scrub')
+    print('%d files found' % len(files))
+
+    batch_size = 10
 
     for fileNum, f in enumerate(files[startIndex:]):
         print('running batch %d' % fileNum)
 
         # dump log
-        if (fileNum + 1) % 10 == 0:
+        if (fileNum + 1) % batch_size == 0:
             logstr = '----------------------\n'
-            logstr += 'file #      : %d-%d\n' % (fileNum + startIndex - 19, fileNum + startIndex + 1)
+            logstr += 'file #      : %d-%d\n' % (fileNum + startIndex - batch_size, fileNum + startIndex + batch_size + 1)
             logstr += 'gifs w/faces: %d\n' % gif_with_face
             logstr += 'fail        : %d\n' % len(errors)
             logstr += 'num alpha   : %d\n' % alphaCount
@@ -347,8 +353,7 @@ def run(src, dest):
             with open(configfile, 'w') as configger:
                 json.dump(config, configger)
 
-        fileName = os.path.splitext(os.path.basename(f))[0]
-
+        file_name = os.path.splitext(os.path.basename(f))[0]
 
         # scrub process starts here
         try:
@@ -395,15 +400,32 @@ def run(src, dest):
                             })
                     _people.append((frameId, faces))
 
-                with open(os.path.join(dest, '%s.json' % fileName), 'w') as people_file:
+                with open(os.path.join(dest, '%s.json' % file_name), 'w') as people_file:
                     json.dump(_people, people_file)
                 del _people
+
+            print('    saving face snips')
+            snips_saved = 0
+            if(False):
+                for frameId, peopleData in people:
+                    for person in peopleData:
+                        bb = person['boundingbox']
+                        pid = person['id']
+
+                        snip = cropBoundingBox(bb, frames[frameId])
+                        cv2.imwrite(os.path.join(dest, '%d-%d-%d.jpg' % (file_name, pid, frameId)), snip)
+                        snips_saved += 1
+
+                        # explicitly delete the snip (have been having memory errors)
+                        del snip
+                print('        %d snips saved' % snips_saved)
 
             del frames, people, bbs, lmds
 
         except Exception as e:
             print('    Exception occured: %s' % str(e))
-            errors.append((fileName, str(e)))
+
+            errors.append((file_name, str(e)))
 
 
 if __name__ == '__main__':
