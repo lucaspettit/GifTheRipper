@@ -176,13 +176,17 @@ class Rectangle(object):
     # PUPLIC METHODS
     ###########################################################
 
-    def toJSON(self, encoding='ltrb', **kwargs):
+    def toList(self, encoding='ltrb'):
         if encoding == 'ltrb':
-            json.dumps([self.left, self.top, self.right, self.bottom])
+            val = [self.left, self.top, self.right, self.bottom]
         elif encoding == 'xywh':
-            json.dumps([self.x, self.y, self.width, self.height])
+            val = [self.x, self.y, self.width, self.height]
         else:
             raise ValueError('Rectangle.toJSON: Invalid encoding value %s' % encoding)
+        return val
+
+    def toJSON(self, encoding='ltrb'):
+        return json.dumps(self.toList(encoding))
 
     def moveByVector(self, vector: np.ndarray):
         dX = vector[0]
@@ -459,18 +463,28 @@ class GIF(object):
 
     @classmethod
     def fromFile(cls, path: str):
-        reader = imageio.mimread(uri=path, memtest=False)
-        new_class = cls()
-        new_class._frames, alpha = GIF._extractFrames(reader)
-        new_class._num_frames = len(new_class._frames)
-        new_class._encoding = 'alpha' if alpha else 'standard'
+        if os.path.splitext(path)[-1].lower() == '.gif':
+            reader = imageio.mimread(uri=path, memtest=False)
+            new_class = cls()
+            new_class._frames, alpha = GIF._extractFrames(reader)
+            new_class._num_frames = len(new_class._frames)
+            new_class._encoding = 'alpha' if alpha else 'standard'
 
-        # get dims
-        frame = new_class._frames[0]
-        new_class._height = frame.shape[0]
-        new_class._width = frame.shape[1]
+            # get dims
+            frame = new_class._frames[0]
+        else:
+            try:
+                frame = cv2.imread(path)
+                new_class = cls()
+                new_class._frames = [frame]
+                new_class._encoding = 'standard'
+                new_class._num_frames = 1
+            except Exception as e:
+                raise ValueError('GIPHY.fromFile: Unable to open file type %s' % os.path.split(path)[-1].lower())
 
         # get channels
+        new_class._height = frame.shape[0]
+        new_class._width = frame.shape[1]
         if len(frame.shape) == 3:
             new_class._channels = frame.shape[2]
         elif len(frame.shape) == 2:
@@ -627,6 +641,7 @@ class GIF(object):
             finally:
                 writer.close()
 
+
 class Player(object):
 
     @staticmethod
@@ -660,6 +675,19 @@ def smooth(y, window_size=5):
     _y = [y[0]] * pad_size + y + [y[-1]] * pad_size
     y_smooth = np.convolve(_y, window, mode='same')
     return y_smooth[pad_size:-pad_size]
+
+
+def init_dirs():
+    logdir = 'logs'
+    resdir = 'res'
+    configdir = 'config'
+    for p in (configdir, logdir, resdir):
+        if not os.path.isdir(p):
+            os.makedirs(p)
+
+    return {'log': logdir,
+            'res': resdir,
+            'config': configdir}
 
 
 if __name__ == '__main__':
@@ -719,7 +747,6 @@ if __name__ == '__main__':
         ax3.set_ylabel('Value')
         fig.tight_layout()
         plt.savefig(os.path.join(args.dest, '%s-%d-smoothing-graph.png' % (gifname, i)), bbox_inches='tight')
-
 
         for fd, x, y, dim in zip(fds, nose_smooth_x, nose_smooth_y, dim_smooth):
             # get raw snip
