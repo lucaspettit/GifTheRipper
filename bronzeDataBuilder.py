@@ -5,6 +5,8 @@ from PIL import Image, ImagePalette
 import io
 import argparse
 import json
+import time
+from tqdm import tqdm
 
 limit = 100
 giphy = giphypop.Giphy(api_key='NNfC3hdGO6xciq6jImRy17aLUjqzFIUf')
