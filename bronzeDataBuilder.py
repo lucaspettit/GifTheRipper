@@ -6,10 +6,11 @@ import io
 import argparse
 import json
 import time
-from tqdm import tqdm
+
+from Utils import init_dirs
 
 limit = 100
-giphy = giphypop.Giphy(api_key='NNfC3hdGO6xciq6jImRy17aLUjqzFIUf')
+giphy = giphypop.Giphy(api_key='')
 
 
 def parse_args():
@@ -17,6 +18,27 @@ def parse_args():
     parser.add_argument('--src', type=str, required=True, help='Path to .JSON file with search terms')
     parser.add_argument('--dest', type=str, required=True, help='Destination directory')
     parser.add_argument('--limit', type=int, default=100, help='Limit the number of GIFs for each search')
+    parser.add_argument('--api-key', type=str, required=True, help='GIPHY API key')
+
+    args = parser.parse_args()
+    # verify limit value
+    if args.limit <= 0:
+        raise ValueError('parse_args: Invalid number for \'limit\'. Must be >= 1.')
+
+    # unpack api
+    if path.isfile(args.api_key):
+        ext = path.splitext(args.api_key)[-1]
+        if ext == '.json':
+            j = json.load(args.api_key)
+            if 'api' not in j:
+                raise ValueError('parse_args: Cannot find API. JSON file does not contain key \'api\'.')
+            args.api_key = j['api']
+        elif ext == '.txt':
+            with open(args.api_key) as f:
+                args.api_key = f.readline().strip('\n').strip()
+        else:
+            raise ValueError('parse_args: Cannot find API. Unrecognized file extension')
+
     return parser.parse_args()
 
 
@@ -47,12 +69,13 @@ def gif2jpg(gifbytes):
 
 # load and validate arguments
 args = parse_args()
-logdir = 'logs'
-resdir = 'res'
-configdir = 'config'
-for p in (args.dest, logdir, resdir):
-    if not path.isdir(args.dest):
-        makedirs(args.dest)
+dirnames = init_dirs()
+logdir = dirnames['log']
+resdir = dirnames['res']
+configdir = dirnames['config']
+
+if not path.isdir(args.dest):
+    makedirs(args.dest)
 
 rootdir = args.dest
 setname = path.basename(path.splitext(args.dest)[0])
