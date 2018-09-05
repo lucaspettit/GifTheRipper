@@ -451,7 +451,7 @@ class FaceData(object):
         self._rect.resizeTo(targetW=width, targetH=height)
 
 
-class GIF(object):
+class Reader(object):
     def __init__(self):
         self._frames = []
         self._num_frames = 0
@@ -466,7 +466,7 @@ class GIF(object):
         if os.path.splitext(path)[-1].lower() == '.gif':
             reader = imageio.mimread(uri=path, memtest=False)
             new_class = cls()
-            new_class._frames, alpha = GIF._extractFrames(reader)
+            new_class._frames, alpha = Reader._extractFrames(reader)
             new_class._num_frames = len(new_class._frames)
             new_class._encoding = 'alpha' if alpha else 'standard'
 
@@ -475,6 +475,8 @@ class GIF(object):
         else:
             try:
                 frame = cv2.imread(path)
+                if frame is None:
+                    raise FileNotFoundError('File %s does not exist' % path)
                 new_class = cls()
                 new_class._frames = [frame]
                 new_class._encoding = 'standard'
@@ -589,7 +591,7 @@ class GIF(object):
 
     @property
     def shape(self):
-        return self._height, self._width, self._channels
+        return [self._height, self._width, self._channels, self._num_frames]
 
     @property
     def width(self):
@@ -602,6 +604,13 @@ class GIF(object):
     @property
     def channels(self):
         return self._channels
+
+    def resize(self, N: int, M: int):
+        for i, frame in enumerate(self._frames):
+            frame = cv2.resize(frame, (N, M), interpolation=cv2.INTER_CUBIC)
+            self._frames[i] = frame
+        self._width = N
+        self._height = M
 
     def getSnip(self, index, rect: Rectangle):
         frame = self[index]
@@ -621,6 +630,7 @@ class GIF(object):
 
         snip[copy_top:copy_bottom, copy_left:copy_right] = frame[capture_top:capture_bottom, capture_left:capture_right]
         return snip
+
 
     def save(self, path, as_images=False, **kwargs):
         if not isinstance(path, str):
@@ -653,22 +663,6 @@ class Player(object):
         cv2.destroyWindow(displayName)
 
 
-def unpackJson(path):
-    face_data = {}
-    with open(path) as f:
-        facial_detect_data = json.load(f)
-    for frame_id, faces in facial_detect_data:
-        for face in faces:
-            bb = Rectangle.fromLTRB(face['boundingbox'])
-            lmks = Landmarks.fromDict(face['landmark'])
-            fd = FaceData(bb, lmks, face['id'], frame_id)
-            if fd.id not in face_data:
-                face_data[fd.id] = [fd]
-            else:
-                face_data[fd.id].append(fd)
-    return face_data
-
-
 def smooth(y, window_size=5):
     window = np.ones(window_size) / window_size
     pad_size = int(window_size / 2)
@@ -677,10 +671,10 @@ def smooth(y, window_size=5):
     return y_smooth[pad_size:-pad_size]
 
 
-def init_dirs():
-    logdir = 'logs'
-    resdir = 'res'
-    configdir = 'config'
+def init_dirs(rootdir=''):
+    logdir = os.path.join(rootdir, 'logs')
+    resdir = os.path.join(rootdir, 'res')
+    configdir = os.path.join(rootdir, 'config')
     for p in (configdir, logdir, resdir):
         if not os.path.isdir(p):
             os.makedirs(p)
@@ -711,7 +705,7 @@ if __name__ == '__main__':
     gifname = os.path.basename(os.path.splitext(args.gif_src)[0])
 
     # load gif
-    gif = GIF.fromFile(args.gif_src)
+    gif = Reader.fromFile(args.gif_src)
 
     # build a FaceData object for every face in each frame
     face_data = unpackJson(args.json_src)
@@ -774,13 +768,13 @@ if __name__ == '__main__':
             frames.append(np.hstack((raw, processed)))
         #Player.play(frames, displayName='person %d' % i, delay=delay)
 
-        newGif = GIF.fromFrames(raw_snips[i])
+        newGif = Reader.fromFrames(raw_snips[i])
         newGif.save(os.path.join(args.dest, '%s-%d-raw.gif' % (gifname, i)), as_images=False)
 
-        newGif = GIF.fromFrames(snips[i])
+        newGif = Reader.fromFrames(snips[i])
         newGif.save(os.path.join(args.dest, '%s-%d-smoothed.gif' % (gifname, i)), as_images=False)
 
-        newGif = GIF.fromFrames(frames)
+        newGif = Reader.fromFrames(frames)
         newGif.save(os.path.join(args.dest, '%s-%d-comparison.gif' % (gifname, i)), as_images=False)
 
     print('ok')
