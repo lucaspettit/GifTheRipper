@@ -52,7 +52,7 @@ def detectFaces(detector, gif, min_face_size=32):
                     lmks.append(lmk)
 
             frames_bb.append(bbs)
-            landmarks.append(lmds)
+            landmarks.append(lmks)
 
         else:
             frames_bb.append([])
@@ -123,6 +123,10 @@ def trackFaces(frames_bb, frames_lmks, min_series=5):
     return frame_data
 
 
+def MtCnnModel():
+    return MtcnnDetector(model_folder='MTCNN\\model', ctx=mx.cpu(0), num_worker=4, accurate_landmark=True)
+
+
 def parse_args():
 
     parser = ArgumentParser()
@@ -143,127 +147,136 @@ def parse_args():
 
     return args
 
-# get args
-args = parse_args()
 
-# make standard dirs
-dirnames = init_dirs()
-logdir = dirnames['log']
-resdir = dirnames['res']
-configdir = dirnames['config']
+def process_files(src, dest, log_freq=10, min_series = 5):
+    # make standard dirs
+    dirnames = init_dirs()
+    logdir = dirnames['log']
+    resdir = dirnames['res']
+    configdir = dirnames['config']
 
-script_name = os.path.basename(os.path.splitext(__file__)[0])
-logfile = os.path.join(logdir, '%s_%s_log.txt' % (script_name, os.path.basename(args.dest)))
-configfile = os.path.join(configdir, '%s_%s_config.json' % (script_name, os.path.basename(args.dest)))
+    script_name = os.path.basename(os.path.splitext(__file__)[0])
+    logfile = os.path.join(logdir, '%s_%s_log.txt' % (script_name, os.path.basename(dest)))
+    configfile = os.path.join(configdir, '%s_%s_config.json' % (script_name, os.path.basename(dest)))
 
-# load config file
-if os.path.isfile(configfile):
-    print('loading config file')
-    with open(configfile) as f:
-        config = json.load(f)
-else:
-    print('creating new config file')
-    config = {'startIndex': 0}
-    with open(configfile, 'w') as f:
-        json.dump(config, f)
-start_index = config['startIndex']
-print('done')
-print('start index = %d' % start_index)
+    # load config file
+    if os.path.isfile(configfile):
+        print('loading config file')
+        with open(configfile) as f:
+            config = json.load(f)
+    else:
+        print('creating new config file')
+        config = {'startIndex': 0}
+        with open(configfile, 'w') as f:
+            json.dump(config, f)
+    start_index = config['startIndex']
+    print('done')
+    print('start index = %d' % start_index)
 
-# create log file
-if not os.path.isfile(logfile):
-    open(logfile, 'w').close()
+    # create log file
+    if not os.path.isfile(logfile):
+        open(logfile, 'w').close()
 
-# create dest dir
-if not os.path.isdir(args.dest):
-    os.makedirs(args.dest)
+    # create dest dir
+    if not os.path.isdir(dest):
+        os.makedirs(dest)
+
+    print('loading MTCNN model')
+    _detector = MtCnnModel()
+    print('done!')
+
+    files = [os.path.join(src, f) for f in os.listdir(src)
+             if os.path.splitext(f)[-1].lower() in ('.gif', '.png', '.jpg', '.bmp')]
+
+    # write to log
+    logstr = 'Starting silver scrub\n%d files found' % len(files)
+    with open(logfile, 'a+') as f:
+        f.write(logstr + '\n')
+    print(logstr)
+
+    # build tracking variables
+    errors = []
+    files_with_faces = 0
+
+    # run
+    for fileNum, f in enumerate(files[start_index:]):
+        print('running batch %d' % fileNum)
+
+        # dump log
+        if (fileNum + 1) % log_freq == 0:
+            logstr = '----------------------\n'
+            logstr += 'file #       : %d-%d\n' % (fileNum + start_index - log_freq + 1, fileNum + start_index)
+            logstr += 'files w/faces: %d\n' % files_with_faces
+            logstr += 'fail         : %d\n' % len(errors)
+            logstr += 'time         : %s\n' % datetime.now().strftime('%m/%d %H:%M:%S')
+
+            if len(errors) > 0:
+                logstr += 'Failed GIFs:\n'
+                for filename, errorMessage in errors:
+                    logstr += '\tfilename: %s\n\terror   : %s\n' % (filename, errorMessage)
+
+            # print log data
+            print(logstr)
+
+            # write log file && reset vars
+            with open(logfile, 'a+') as logger:
+                logger.write(logstr)
+            errors = []
+            gif_with_face = 0
+
+            #with open(configfile, 'w') as f:
+            #   config['startIndex'] = fileNum
+            #   json.dump(config, f)
+
+        is_gif = os.path.splitext(f)[-1].lower() == '.gif'
+        _min_series = min_series if is_gif else 1
+        file_name = os.path.splitext(os.path.basename(f))[0]
+
+        # scrub process starts here
+        try:
+            print('    loading file %s' % os.path.basename(f))
+            gif = GIF.fromFile(f)
+
+            # detect faces
+            print('    detecting faces')
+            bbs, lmds = detectFaces(_detector, gif)
+            if len(bbs) == 0:
+                continue
+
+            files_with_faces += 1
+            print('    tracking faces')
+            people = trackFaces(bbs, lmds, _min_series)
+
+            # dump people data
+            if len(people) > 0:
+                # convert all the int32 to int
+                print('    dumping people JSON data')
+                _people = []
+                for frameId, p in people:
+                    faces = []
+                    for face in p:
+                        faces.append(
+                            {
+                                'id': int(face['id']),
+                                'boundingbox': face['boundingbox'].toList(),
+                                'landmark': face['landmark'].toDict()
+                            })
+                    _people.append((frameId, faces))
+
+                outfile = os.path.join(dest, '%s.json' % file_name)
+                with open(outfile, 'w') as people_file:
+                    print('    saving to %s' % outfile)
+                    json.dump(_people, people_file)
+                del _people
+
+            del gif, people, bbs, lmds
+
+        except Exception as e:
+            errors.append((file_name, str(e)))
 
 
-print('loading MTCNN model')
-_detector = MtcnnDetector(model_folder='MTCNN\\model', ctx=mx.cpu(0), num_worker=4, accurate_landmark=True)
-print('done!')
+if __name__ == '__main__':
+    # get args
+    args = parse_args()
 
-files = [os.path.join(args.src, f) for f in os.listdir(args.src)
-         if os.path.splitext(f)[-1].lower() in ('.gif', '.png', '.jpg', '.bmp')]
-
-# write to log
-logstr = 'Starting silver scrub\n%d files found' % len(files)
-with open(logfile, 'a+') as f:
-    f.write(logstr + '\n')
-print(logstr)
-
-# build tracking variables
-errors = []
-files_with_faces = 0
-
-# run
-for fileNum, f in enumerate(files[start_index:]):
-    print('running batch %d' % fileNum)
-
-    # dump log
-    if (fileNum + 1) % args.log_freq == 0:
-        logstr = '----------------------\n'
-        logstr += 'file #       : %d-%d\n' % (fileNum + start_index - args.log_freq + 1, fileNum + start_index)
-        logstr += 'files w/faces: %d\n' % files_with_faces
-        logstr += 'fail         : %d\n' % len(errors)
-        logstr += 'time         : %s\n' % datetime.now().strftime('%m/%d %H:%M:%S')
-
-        if len(errors) > 0:
-            logstr += 'Failed GIFs:\n'
-            for filename, errorMessage in errors:
-                logstr += '\tfilename: %s\n\terror   : %s\n' % (filename, errorMessage)
-
-        # print log data
-        print(logstr)
-
-        # write log file && reset vars
-        with open(logfile, 'a+') as logger:
-            logger.write(logstr)
-        errors = []
-        gif_with_face = 0
-
-        #with open(configfile, 'w') as f:
-        #    config['startIndex'] = i
-        #    json.dump(config, f)
-
-    file_name = os.path.splitext(os.path.basename(f))[0]
-
-    # scrub process starts here
-    try:
-        print('    loading file %s' % f)
-        gif = GIF.fromFile(f)
-
-        # detect faces
-        print('    detecting faces')
-        bbs, lmds = detectFaces(_detector, gif)
-        if len(bbs) == 0:
-            continue
-
-        files_with_faces += 1
-        print('    tracking faces')
-        people = trackFaces(bbs, lmds)
-
-        # dump people data
-        if len(people) > 0:
-            # convert all the int32 to int
-            print('    dumping people JSON data')
-            _people = []
-            for frameId, p in people:
-                faces = []
-                for face in p:
-                    faces.append(
-                        {
-                            'id': int(face['id']),
-                            'boundingbox': face['boundingbox'].toList(),
-                            'landmark': face['landmark'].toDict()
-                        })
-                _people.append((frameId, faces))
-
-            with open(os.path.join(args.dest, '%s.json' % file_name), 'w') as people_file:
-                json.dump(_people, people_file)
-            del _people
-
-        del frames, people, bbs, lmds
-
-    except Exception as e:
-        errors.append((file_name, str(e)))
+    process_files(args.src, args.dest, args.log_freq)
