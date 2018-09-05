@@ -6,9 +6,11 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('--meta-src', type=str, required=True, help='Directory for .json silver data')
-parser.add_argument('--gif-src', type=str, required=True, help='Directory for gif files')
+parser.add_argument('--data-src', type=str, required=True, help='Directory for gif files')
 parser.add_argument('--dest', type=str, required=True, help='Directory to save the snips')
+parser.add_argument('--resdir', type=str, required=False, default='', help='Location for resource folders')
 parser.add_argument('--target-dim', type=int)
+parser.add_argument('--pname', type=str, required=False, default=None, help='Name to distinguish process')
 args = parser.parse_args()
 
 
@@ -20,12 +22,16 @@ if not os.path.isdir(args.meta_src):
 if not os.path.isdir(args.dest):
     os.makedirs(args.dest)
 
-dirnames = init_dirs()
+dirnames = init_dirs(rootdir=args.resdir)
 resdir = dirnames['res']
 configdir = dirnames['config']
-dataset_name = os.path.basename(args.dest)
 
-configpath = os.path.join(configdir, 'goldDataScrubConfig-%s.json' % dataset_name)
+# if no pname, set it to the folder name
+if args.pname is None:
+    args.pname = os.path.basename(args.dest)
+
+
+configpath = os.path.join(configdir, 'goldConfig-%s.json' % args.pname)
 if args.target_dim is not None:
     target_dim = args.target_dim, args.target_dim
 else:
@@ -41,7 +47,7 @@ start_index = config['start_index']
 
 # get list of .json files from src
 
-files = [f for f in os.listdir(args.meta_src)]
+files = sorted([f for f in os.listdir(args.meta_src)], key=lambda x: int(os.path.splitext(x)[0]))
 print('starting gold scrub')
 print('%d files found' % len(files))
 
@@ -49,14 +55,33 @@ print('%d files found' % len(files))
 for i, filename in enumerate(files[start_index:]):
 
     # file_basename
-    file_basename = os.path.splitext(filename)[0]
+    file_basename, file_ext = os.path.splitext(filename)
 
     # log stuff
     print('File - %s' % file_basename)
 
     try:
-        gif = GIF.fromFile(os.path.join(args.gif_src, '%s.gif' % file_basename))
-        face_data = unpackJson(os.path.join(args.meta_src, filename))
+
+        with open(os.path.join(args.meta_src, filename)) as f:
+            data = json.load(f)
+
+        img_dim = data['shape'][:2]
+
+        face_data = {}
+        for frame_id, faces in data['frames']:
+            for face in faces:
+                bb = Rectangle.fromLTRB(face['boundingbox'])
+                lmks = Landmarks.fromDict(face['landmark'])
+                fd = FaceData(bb, lmks, face['id'], frame_id)
+                if fd.id not in face_data:
+                    face_data[fd.id] = [fd]
+                else:
+                    face_data[fd.id].append(fd)
+        reader = Reader.fromFile(os.path.join(args.data_src, '%s%s' % (data['filename'], data['filetype'])))
+        img_dim = data['shape'][:2]
+        if file_basename == '1':
+            print('ok')
+        reader.resize(img_dim[0], img_dim[1])
 
         people = {}
 
@@ -77,7 +102,7 @@ for i, filename in enumerate(files[start_index:]):
                 fd.expandRegionTo(dim, dim)
 
                 # get post-processed snip
-                snip = gif.getSnip(fd.frameId, fd.boundingBox)
+                snip = reader.getSnip(fd.frameId, fd.boundingBox)
                 if target_dim is not None:
                     snip = cv2.resize(snip, target_dim, interpolation=cv2.INTER_CUBIC)
 
