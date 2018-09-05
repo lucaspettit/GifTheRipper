@@ -42,13 +42,24 @@ def resizeRect(rect, targetDim):
     return l, t, l + targetDim, t + targetDim
 
 
+def resize_img(img, max_dim=1024):
+    w, h = img.shape[:2]
+    if w > h:
+        x = max_dim / w
+    else:
+        x = max_dim / h
+
+    _w = int(w * x)
+    _h = int(h * x)
+
+    img = cv2.resize(img, (_w, _h), interpolation=cv2.INTER_CUBIC)
+
+    return img
+
+
 def normifyBoundingBoxes(bbs):
     size = max([B - T for _, T, _, B in bbs])
     return [resizeRect(bb, size) for bb in bbs]
-
-
-def MtcnnModel():
-    return MtcnnDetector(model_folder='MTCNN\\model', ctx=mx.cpu(0), num_worker=4, accurate_landmark=True)
 
 
 def loadFrames(paths):
@@ -266,20 +277,35 @@ def cropBoundingBox(bb, frame):
     return snip
 
 
-def run(src, dest):
+def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
     if not os.path.isdir(src):
         raise (NotADirectoryError('"%s" is not a directory' % src))
 
-    #if not os.path.isdir(dest):
-    #    os.makedirs(dest)
+    if not os.path.isdir(dest):
+        print('destination folder not found. creating one.')
+        os.makedirs(dest)
+
+    logdir = os.path.join(resource_dir, 'log')
+    resdir = os.path.join(resource_dir, 'res')
+    configdir = os.path.join(resource_dir, 'config')
 
     # build detector
     print('loading MTCNN model')
-    detector = MtcnnModel()
+    detector = MtcnnDetector(model_folder=os.path.join('MTCNN', 'model'),
+                             ctx=mx.gpu(0) if gpu else mx.cpu(0),
+                             num_worker=4,
+                             accurate_landmark=True)
     print('done!')
 
     # get the list of files
-    files = [os.path.join(src, f) for f in os.listdir(src) if os.path.splitext(f)[1].lower() == '.gif']
+    files = []
+    VIDEO_EXTENSIONS = ('.gif',)
+    STILL_EXTENSIONS = ('.jpg', '.png', '.jpeg', '.bmp', '.tiff')
+    VALID_EXTENSIONS = ('.gif', '.jpg', '.png', '.jpeg', '.bmp', '.tiff')
+    for f in os.listdir(src):
+        ext = os.path.splitext(f)[-1].lower()
+        if ext in VALID_EXTENSIONS:
+            files.append(os.path.join(src, f))
     try:
         files = sorted(files, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
     except Exception as e:
@@ -289,18 +315,15 @@ def run(src, dest):
     errors = []
     alphaCount = 0
     gif_with_face = 0
-    logdir = 'logs'
-    resdir = 'res'
-    configdir = 'config'
 
     # build paths
     for x in (logdir, resdir, configdir):
         if not os.path.isdir(x):
-            os.mkdir(x)
+            print('directory %s not found. creating one.' % x)
+            os.makedirs(x)
 
-    logfile = os.path.join(logdir, 'silverDataScrubLog-%s.txt' % os.path.basename(dest))
-    configfile = os.path.join(configdir, 'silverDataScrubConfig-%s.json' % os.path.basename(dest))
-
+    logfile = os.path.join(logdir, 'Log-%s.txt' % process_name)
+    configfile = os.path.join(configdir, 'Config-%s.json' % process_name)
 
     print('loading config file')
     if os.path.isfile(configfile):
@@ -312,28 +335,39 @@ def run(src, dest):
     print('done!')
     print('start index = %d' % startIndex)
 
-    with open(logfile, 'a+') as f:
-        f.write('Starting silver scrub\n')
-        f.write('%d files found\n' % len(files))
+    # initial log write
+    if not os.path.isfile(logfile):
+        with open(logfile, 'w') as f:
+            f.write('Starting silver scrub\n')
+            f.write('%d files found\n' % len(files))
+    else:
+        with open(logfile, 'a+') as f:
+            f.write('Starting silver scrub\n')
+            f.write('%d files found\n' % len(files))
+
     print('Starting silver scrub')
     print('%d files found' % len(files))
 
-    batch_size = 10
+    batch_size = 80 if gpu else 10
+    SERIES_MIN_FRAMES = 5
+    STILL_MIN_FRAMES = 1
+    MAX_IMG_SIZE = 1024
 
     for fileNum, f in enumerate(files[startIndex:]):
-        print('running batch %d' % fileNum)
+        #print('running batch %d' % fileNum)
 
         # dump log
         if (fileNum + 1) % batch_size == 0:
             logstr = '----------------------\n'
-            logstr += 'file #      : %d-%d\n' % (fileNum + startIndex - batch_size, fileNum + startIndex + batch_size + 1)
-            logstr += 'gifs w/faces: %d\n' % gif_with_face
+            logstr += 'file #      : %d-%d\n' % (fileNum + startIndex - batch_size + 1,
+                                                 fileNum + startIndex + 1)
+            logstr += 'imgs w/faces: %d\n' % gif_with_face
             logstr += 'fail        : %d\n' % len(errors)
             logstr += 'num alpha   : %d\n' % alphaCount
             logstr += 'time        : %s\n' % datetime.now().strftime('%m/%d %H:%M:%S')
 
             if len(errors) > 0:
-                logstr += 'Failed GIFs:\n'
+                logstr += 'Failed files:\n'
                 for filename, errorMessage in errors:
                     logstr += '\tfilename: %s\n\terror   : %s\n' % (filename, errorMessage)
 
@@ -341,8 +375,21 @@ def run(src, dest):
             print(logstr)
 
             # write log file && reset vars
-            with open(logfile, 'a+') as logger:
-                logger.write(logstr)
+            try:
+                with open(logfile, 'a+') as logger:
+                    logger.write(logstr)
+            except FileNotFoundError as e:
+                logfile_splitlist = os.path.basename(logfile).split('(')
+                if len(logfile_splitlist) == 1:
+                    logcount = 1
+                else:
+                    logcount = int(logfile_splitlist[-1].split(')')[0]) + 1
+                logfile_splitlist = logfile.split('.')
+                logfile = '%s(%d).%s' % (logfile_splitlist[0], logcount, logfile_splitlist[1])
+
+                with open(logfile, 'w') as logger:
+                    logger.write(logstr)
+
             errors = []
             gif_with_face = 0
             alphaCount = 0
@@ -353,36 +400,53 @@ def run(src, dest):
             with open(configfile, 'w') as configger:
                 json.dump(config, configger)
 
-        file_name = os.path.splitext(os.path.basename(f))[0]
+        file_name, file_ext = os.path.splitext(os.path.basename(f))
 
         # scrub process starts here
         try:
-            print('    reading GIF %s' % os.path.basename(f))
-            reader = imageio.mimread(uri=f, memtest=False)
+            if file_ext in VIDEO_EXTENSIONS:
+                # print('    reading video %s' % file_name)
+                reader = imageio.mimread(uri=f, memtest=False)
 
-            print('    extracting frames')
-            frames, hasAlphaUpdate = extractFrames(reader)
-            del reader
-            print('        %d frames' % len(frames))
+                # print('    extracting frames')
+                frames, hasAlphaUpdate = extractFrames(reader)
+                frame_shape = list(reader.shape[:3])
+                del reader
+                is_series = True
+            else:
+                # print('    reading still %s' % file_name)
+                img = cv2.imread(f)
+                # skip if image is None.
+                # this happens when OpenCV cannot read a file.
+                if img is None:
+                    continue
+
+                if max(img.shape[:2]) > MAX_IMG_SIZE:
+                    img = resize_img(img, max_dim=MAX_IMG_SIZE)
+                frames = [img]
+                hasAlphaUpdate = False
+                is_series = False
+                frame_shape = list(img.shape) if len(img.shape) >= 3 else list(img.shape) + [1]
+            # print('        %d frames' % len(frames))
 
             if hasAlphaUpdate:
                 alphaCount += 1
 
             # detect faces
-            print('    detecting faces')
+            # print('    detecting faces')
             bbs, lmds = detectFaces(detector, frames)
             if len(bbs) == 0:
                 continue
 
             gif_with_face += 1
-            print('    tracking faces')
-            people = trackFaces(bbs, lmds)
+            # print('    tracking faces')
+            people = trackFaces(bbs, lmds, min_series=SERIES_MIN_FRAMES if is_series else STILL_MIN_FRAMES)
 
             # dump people data
             if len(people) > 0:
                 # convert all the int32 to int
-                print('    dumping people JSON data')
-                _people = []
+                # print('    dumping people JSON data')
+                _frames = []
                 for frameId, p in people:
                     faces = []
                     for face in p:
@@ -398,41 +462,37 @@ def run(src, dest):
                                              'nose': [int(face['landmark']['nose'][i]) for i in range(2)]
                                              }
                             })
-                    _people.append((frameId, faces))
+                    _frames.append((frameId, faces))
+                _people = {
+                    'filename': file_name,
+                    'filetype': file_ext,
+                    'frames': _frames,
+                    'shape': list(img.shape)
+                }
 
                 with open(os.path.join(dest, '%s.json' % file_name), 'w') as people_file:
-                    json.dump(_people, people_file)
+                    json.dump(_people, people_file, indent=2)
                 del _people
-
-            print('    saving face snips')
-            snips_saved = 0
-            if(False):
-                for frameId, peopleData in people:
-                    for person in peopleData:
-                        bb = person['boundingbox']
-                        pid = person['id']
-
-                        snip = cropBoundingBox(bb, frames[frameId])
-                        cv2.imwrite(os.path.join(dest, '%d-%d-%d.jpg' % (file_name, pid, frameId)), snip)
-                        snips_saved += 1
-
-                        # explicitly delete the snip (have been having memory errors)
-                        del snip
-                print('        %d snips saved' % snips_saved)
 
             del frames, people, bbs, lmds
 
         except Exception as e:
-            print('    Exception occured: %s' % str(e))
-
-            errors.append((file_name, str(e)))
+            error_msg = 'Exception occured: %s\n' % str(e)
+            error_msg += (' - FileName = %s' % file_name)
+            error_msg += (' - FileExt  = %s' % file_ext)
+            error_msg += (' - Error    = %s' % str(e))
+            errors.append((file_name, error_msg))
 
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
-    parser.add_argument('--src')
-    parser.add_argument('--dest')
+    parser.add_argument('--src', required=True, type=str, help='Source folder with Images/GIFs/Videos')
+    parser.add_argument('--dest', required=True, type=str, help='Destination folder for .JSON objects to be saved')
+    parser.add_argument('--pname', required=False, type=str, default='silverDataScrub', help='Process name for resource files')
+    parser.add_argument('--resdir', required=False, type=str, default='', help='Directory to store resource files')
+    parser.add_argument('--gpu', required=False, type=str, default=False, help='Flag to denote GPU support (True for GPU, False for CPU)')
     args = parser.parse_args()
-    run(args.src, args.dest)
+
+    run(src=args.src, dest=args.dest, process_name=args.pname, resource_dir=args.resdir, gpu=args.gpu)
