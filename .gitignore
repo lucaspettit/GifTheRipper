@@ -5,6 +5,7 @@ $py.class
 <<<<<<< HEAD
 .idea/
 config/
+log/
 =======
 config
 logs
