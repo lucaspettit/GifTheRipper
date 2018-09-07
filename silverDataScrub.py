@@ -322,8 +322,8 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
             print('directory %s not found. creating one.' % x)
             os.makedirs(x)
 
-    logfile = os.path.join(logdir, 'Log-%s.txt' % process_name)
-    configfile = os.path.join(configdir, 'Config-%s.json' % process_name)
+    logfile = os.path.join(logdir, 'Log-Detect-%s.txt' % process_name)
+    configfile = os.path.join(configdir, 'Config-Detect-%s.json' % process_name)
 
     print('loading config file')
     if os.path.isfile(configfile):
@@ -413,6 +413,8 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
                 frame_shape = list(reader.shape[:3])
                 del reader
                 is_series = True
+                if hasAlphaUpdate:
+                    alphaCount += 1
             else:
                 # print('    reading still %s' % file_name)
                 img = cv2.imread(f)
@@ -428,9 +430,6 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
                 is_series = False
                 frame_shape = list(img.shape) if len(img.shape) >= 3 else list(img.shape) + [1]
             # print('        %d frames' % len(frames))
-
-            if hasAlphaUpdate:
-                alphaCount += 1
 
             # detect faces
             # print('    detecting faces')

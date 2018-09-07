@@ -607,10 +607,10 @@ class Reader(object):
 
     def resize(self, N: int, M: int):
         for i, frame in enumerate(self._frames):
-            frame = cv2.resize(frame, (N, M), interpolation=cv2.INTER_CUBIC)
+            frame = cv2.resize(frame, (M, N), interpolation=cv2.INTER_CUBIC)
             self._frames[i] = frame
-        self._width = N
-        self._height = M
+        self._width = M
+        self._height = N
 
     def getSnip(self, index, rect: Rectangle):
         frame = self[index]
@@ -672,7 +672,7 @@ def smooth(y, window_size=5):
 
 
 def init_dirs(rootdir=''):
-    logdir = os.path.join(rootdir, 'logs')
+    logdir = os.path.join(rootdir, 'log')
     resdir = os.path.join(rootdir, 'res')
     configdir = os.path.join(rootdir, 'config')
     for p in (configdir, logdir, resdir):

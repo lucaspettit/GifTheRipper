@@ -31,7 +31,7 @@ if args.pname is None:
     args.pname = os.path.basename(args.dest)
 
 
-configpath = os.path.join(configdir, 'goldConfig-%s.json' % args.pname)
+configpath = os.path.join(configdir, 'Config-Extract-%s.json' % args.pname)
 if args.target_dim is not None:
     target_dim = args.target_dim, args.target_dim
 else:
@@ -47,7 +47,8 @@ start_index = config['start_index']
 
 # get list of .json files from src
 
-files = sorted([f for f in os.listdir(args.meta_src)], key=lambda x: int(os.path.splitext(x)[0]))
+files = sorted([f for f in os.listdir(args.meta_src) if os.path.splitext(f)[-1] == '.json'],
+               key=lambda x: int(os.path.splitext(x)[0]))
 print('starting gold scrub')
 print('%d files found' % len(files))
 
@@ -79,8 +80,7 @@ for i, filename in enumerate(files[start_index:]):
                     face_data[fd.id].append(fd)
         reader = Reader.fromFile(os.path.join(args.data_src, '%s%s' % (data['filename'], data['filetype'])))
         img_dim = data['shape'][:2]
-        if file_basename == '1':
-            print('ok')
+
         reader.resize(img_dim[0], img_dim[1])
 
         people = {}
