@@ -43,7 +43,7 @@ def resizeRect(rect, targetDim):
 
 
 def resize_img(img, max_dim=1024):
-    w, h = img.shape[:2]
+    h, w = img.shape[:2]
     if w > h:
         x = max_dim / w
     else:
@@ -415,7 +415,7 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
                 is_series = True
                 if hasAlphaUpdate:
                     alphaCount += 1
-            else:
+            elif file_ext in STILL_EXTENSIONS:
                 # print('    reading still %s' % file_name)
                 img = cv2.imread(f)
                 # skip if image is None.
@@ -430,6 +430,8 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
                 is_series = False
                 frame_shape = list(img.shape) if len(img.shape) >= 3 else list(img.shape) + [1]
             # print('        %d frames' % len(frames))
+            else:
+                continue
 
             # detect faces
             # print('    detecting faces')
@@ -466,7 +468,7 @@ def run(src, dest, process_name='silverDataScrub', resource_dir='', gpu=False):
                     'filename': file_name,
                     'filetype': file_ext,
                     'frames': _frames,
-                    'shape': list(img.shape)
+                    'shape': list(frame_shape)
                 }
 
                 with open(os.path.join(dest, '%s.json' % file_name), 'w') as people_file:
